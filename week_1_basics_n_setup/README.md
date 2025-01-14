@@ -1,6 +1,5 @@
-# Introduction to Docker
 
-1.2.1
+1.2.1 Introduction to Docker
 
 LINK: https://www.youtube.com/watch?v=EYNwNlOrpr0&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=4&ab_channel=DataTalksClub%E2%AC%9B
 
@@ -18,7 +17,7 @@ we can modify more the dockerfile and run it:
 ['pipeline.py', '2021-01-15', '123']
 job finished successfully for day = 2021-01-15
 
-1.2.2
+1.2.2, Ingesting Data to Postgres
 
 LINK: https://www.youtube.com/watch?v=2JM-ziJt0WI&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=5&ab_channel=DataTalksClub%E2%AC%9B
 
@@ -57,3 +56,55 @@ root, root
 
 now we will take the dataset and load to the postgres database. Let's run jupyter notebook.
 
+
+1.2.3, connecting PGadmin with Postgres
+
+LINK: https://www.youtube.com/watch?v=hCAIVe9N0ow&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=7&ab_channel=DataTalksClub%E2%AC%9B
+
+SELECT count(1) FROM yellow_taxi_data;
+
+SELECT max(tpep_pickup_datetime), min(tpep_pickup_datetime), max(total_amount) FROM yellow_taxi_data;
+
+this is not very convenient, so we will use pgadmin to connect to the postgres database.
+https://www.pgadmin.org/download/pgadmin-4-container/
+
+
+docker run -it \
+  -e PGADMIN_DEFAULT_EMAIL=admin@admin.com \
+  -e PGADMIN_DEFAULT_PASSWORD=root \
+  -p 8080:80 \
+  -d dpage/pgadmin4:latest
+
+go to http://localhost:8080/browser/
+
+here we create a server and try to connect to localhost:5432, but it will fail, because localhost is because we are running the pgadmin in docker, and the postgres is running in another container.
+
+We need to link the pgadmin with the postgres container, we can put them together in the same network.
+
+so, stop both containers. 
+docker stop <container_id>
+docker rm <container_id>
+
+now we do:
+docker network create pg-network
+
+docker run -it \
+  -e POSTGRES_USER=root \
+  -e POSTGRES_PASSWORD=root \
+  -e POSTGRES_DB=ny_taxi \
+  -v $(pwd)/ny_taxi_postgres_data:/var/lib/postgresql/data \
+  -p 5432:5432 \
+  --network=pg-network \
+  --name pg-database \
+  postgres:13
+
+
+docker run -it \
+  -e PGADMIN_DEFAULT_EMAIL=admin@admin.com \
+  -e PGADMIN_DEFAULT_PASSWORD=root \
+  -p 8080:80 \
+  --network=pg-network \
+  --name pg-admin \
+  dpage/pgadmin4
+
+now, in pgAdmin, when creating a server, we can select the network pg-network as host name.
