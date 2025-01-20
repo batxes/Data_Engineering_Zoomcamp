@@ -107,4 +107,220 @@ docker run -it \
   --name pg-admin \
   dpage/pgadmin4
 
-now, in pgAdmin, when creating a server, we can select the network pg-network as host name.
+now, in pgAdmin, when creating a server, we can select the network pg-database as host name. (it will fine the name of the postgres container)
+
+1.2.4, Dockerizing the ingestion pipeline
+LINK: https://www.youtube.com/watch?v=B1WwATwf-vY&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=8&ab_channel=DataTalksClub%E2%AC%9B
+
+I will turn the notebook into script, and put the code in the pipeline.py file.
+
+first: jupyter nbconvert --to=script eda.ipynb
+
+add some code to the file, like argparse to pass the parameters.
+
+now, in pgadmin, remove the table yellow_taxi_data:
+
+DROP TABLE yellow_taxi_data;
+
+now run: 
+
+URL=https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2021-01.parquet
+
+python ingest_data.py \
+  --user=root \
+  --password=root \
+  --host=localhost \
+  --port=5432 \
+  --db=ny_taxi \
+  --table_name=yellow_taxi_data \
+  --url=${URL}
+
+----- password should be in env variables
+
+
+now that it works, we can create a docker image to run the pipeline. Modify the Dockerfile and build the image.
+
+docker build -t taxi_ingest:v001 .
+
+Now run it:
+
+docker run -it \
+  --network=pg-network \
+  taxi_ingest:v001 \
+    --user=root \
+    --password=root \
+    --host=pg-database \
+    --port=5432 \
+    --db=ny_taxi \
+    --table_name=yellow_taxi_data \
+    --url=${URL}
+
+1.2.5  Running Postgres and pgAdmin with Docker-Compose
+
+LINK: https://www.youtube.com/watch?v=hKI6PkPhpa0&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=9&ab_channel=DataTalksClub%E2%AC%9B
+
+we will use docker-compose to run the postgres and pgadmin, because it will be easier to manage the containers.
+Services inside docker-compose.yaml are automatically in the same network, so we do not need to specify the network.
+
+so, lets stop the containers and run docker-compose up.
+
+docker-compose up
+
+to stop, ctrl+c and then docker-compose down
+
+1.2.6 - SQL Refreshser
+
+LINK: https://www.youtube.com/watch?v=QEcps_iskgg&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=10&ab_channel=DataTalksClub%E2%AC%9B
+
+we will ingest the taxi zones data: https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv
+
+I will add the code to do it in create_second_table_ingestion.py file.
+Then, run this:
+
+python create_second_table.py \
+    --user=root \
+    --password=root \
+    --host=localhost \
+    --port=5432 \
+    --db=ny_taxi 
+
+check that we can access with localhost.
+
+
+Different queries:
+
+- joining tables (inner join)
+SELECT 
+	tpep_pickup_datetime,
+	tpep_dropoff_datetime,
+	total_amount,
+	CONCAT(zpu."Borough",' / ',zpu."Zone") AS "pickup_loc",
+	CONCAT(zdo."Borough",' / ',zdo."Zone") AS "dropoff_loc"
+FROM 
+	yellow_taxi_data t, 
+	zones zpu, 
+	zones zdo
+WHERE
+	t."PULocationID" = zpu."LocationID" AND
+	t."DOLocationID" = zdo."LocationID"
+LIMIT 100;
+
+This is the same as before, but with explicit inner join:
+
+SELECT 
+	tpep_pickup_datetime,
+	tpep_dropoff_datetime,
+	total_amount,
+	CONCAT(zpu."Borough",' / ',zpu."Zone") AS "pickup_loc",
+	CONCAT(zdo."Borough",' / ',zdo."Zone") AS "dropoff_loc"
+FROM 
+	yellow_taxi_data t JOIN zones zpu
+		ON t."PULocationID" = zpu."LocationID"
+	JOIN zones zdo
+		ON t."DOLocationID" = zdo."LocationID"
+	
+LIMIT 100;
+
+- check if there is any null values:
+
+SELECT 
+	tpep_pickup_datetime,
+	tpep_dropoff_datetime,
+	total_amount,
+	"PULocationID",
+	"DOLocationID"
+FROM 
+	yellow_taxi_data t 
+WHERE
+	"PULocationID" IS null
+
+- check if there are any locations that are not in the zones table:
+
+SELECT 
+	tpep_pickup_datetime,
+	tpep_dropoff_datetime,
+	total_amount,
+	"PULocationID",
+	"DOLocationID"
+FROM 
+	yellow_taxi_data t 
+WHERE
+	"PULocationID" NOT IN (SELECT "LocationID" FROM zones)
+
+- delete smoe data
+
+DELETE FROM zones WHERE "LocationID" = 142;
+
+- and now, we will check outer join. Basically, we deleted 142, and we want when we execute the query above, to return for that location NULL or something similar. We use LEFT JOIN, means that if it is present in the left table, it will return the data, if not, it will return NULL.
+
+SELECT 
+	tpep_pickup_datetime,
+	tpep_dropoff_datetime,
+	total_amount,
+	CONCAT(zpu."Borough",' / ',zpu."Zone") AS "pickup_loc",
+	CONCAT(zdo."Borough",' / ',zdo."Zone") AS "dropoff_loc"
+FROM 
+	yellow_taxi_data t LEFT JOIN zones zpu
+		ON t."PULocationID" = zpu."LocationID"
+	LEFT JOIN zones zdo
+		ON t."DOLocationID" = zdo."LocationID"
+LIMIT 100;
+
+- RIGHT JOIN: would be the same but for zones in this case. 
+
+- OUTER JOIN, is a combination of LEFT JOIN and RIGHT JOIN: SHows records on the left when the are no records on the right, and vice versa.
+
+- Here, we show DATE_TRUNC, which only shows days. We can also use CAST
+SELECT 
+	DATE_TRUNC('DAY', tpep_dropoff_datetime),
+	total_amount
+FROM 
+	yellow_taxi_data 
+LIMIT 100;
+
+SELECT 
+	CAST(tpep_dropoff_datetime AS DATE),
+	total_amount
+FROM 
+	yellow_taxi_data 
+LIMIT 100;
+
+-using GROUP BY: Here we group all dates and count number of rows.
+
+SELECT 
+	CAST(tpep_dropoff_datetime AS DATE) as "day",
+  COUNT(1) as "count"
+FROM 
+	yellow_taxi_data t
+GROUP BY
+  CAST(tpep_dropoff_datetime AS DATE)
+ORDER BY "count" DESC;
+
+- we can also add aggregations, like SUM, AVG, MIN, MAX, etc.
+
+SELECT 
+	CAST(tpep_dropoff_datetime AS DATE) as "day",
+  COUNT(1) as "count",
+  MAX (total_amount),
+  MAX(passenger_count)
+FROM 
+	yellow_taxi_data t
+GROUP BY
+  CAST(tpep_dropoff_datetime AS DATE)
+ORDER BY "count" DESC;
+
+- TO GROUP BY MULTIPLE FIELDS
+
+SELECT 
+	CAST(tpep_dropoff_datetime AS DATE) as "day",
+	"DOLocationID",
+  COUNT(1) as "count",
+  MAX (total_amount),
+  MAX(passenger_count)
+FROM 
+	yellow_taxi_data t
+GROUP BY
+  1, 2
+ORDER BY "day" ASC, "DOLocationID" ASC;
+
+
