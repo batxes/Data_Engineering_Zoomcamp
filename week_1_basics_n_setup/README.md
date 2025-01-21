@@ -324,3 +324,59 @@ GROUP BY
 ORDER BY "day" ASC, "DOLocationID" ASC;
 
 
+1.3.1 - Terraform primer
+
+LINK: https://www.youtube.com/watch?v=s2bOYDCKl_M&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=12&ab_channel=DataSlinger
+
+Terraform is a tool for building, changing, and versioning infrastructure safely and efficiently.Allows us to define the infrastructure as code and then apply it to the cloud provider.
+
+Terraform is a declarative language, which means that we describe the desired state of the infrastructure, and Terraform will take care of creating and managing the infrastructure.
+
+Key Terraform commands:
+
+terraform init -> initialize the working directory
+terraform plan -> plan the changes
+terraform apply -> apply the changes
+terraform destroy -> destroy the infrastructure
+
+1.3.2 - Terraform Basics
+
+LINK: https://www.youtube.com/watch?v=Y2ux7gq3Z0o&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=12&ab_channel=DataSlinger
+
+We will set up Terraform in GCP. For that we need a service account. Is like a user account but we won't login with it. It will be used by software to access the resources.
+
+We will go to IAM and Admin -> service accounts -> create service account.
+we will want cloud storage admin  and bigquery admin.
+In the future, we would restrict the permissions a little bit, not give all permissions.
+
+If in the future we want more roles, we can go to IAM -> edit -> add more roles.
+We will also add Compute Admin.
+
+Now, we will create a new key for the service account. Json.
+
+Securely save the key in a safe place. I saved it in the keys folder, and added to gitignore, so I dont upload it to github.
+
+Now, install in vscode the Terraform extension.
+Create main.tf file in the 3_terraform folder.
+search for  google coud platform provider: https://registry.terraform.io/providers/hashicorp/google/latest/docs 
+and add it to the main.tf file.
+add project and region to google provider. They are also in the linke above.
+
+We can align the json with "terraform fmt".
+
+Go to the GCP dashboard to grab the project id. 
+Add also the credentials to the main.tf file. ANother way of authentication is using the gcloud cli. -> gcloud default auth-login -> gives us a link.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
