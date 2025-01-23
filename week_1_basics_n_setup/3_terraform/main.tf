@@ -14,4 +14,18 @@ provider "google" {
   region      = "europe-west3"
 }
 
+resource "google_storage_bucket" "demo-bucket" {
+  name          = "sylvan-cirrus-448510-s0-terra-bucket"
+  location      = "EU"
+  force_destroy = true
+
+  lifecycle_rule {
+    condition {
+      age = 1
+    }
+    action {
+      type = "AbortIncompleteMultipartUpload"
+    }
+  }
+}
 

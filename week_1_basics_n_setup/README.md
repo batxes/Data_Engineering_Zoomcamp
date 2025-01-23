@@ -367,6 +367,32 @@ We can align the json with "terraform fmt".
 Go to the GCP dashboard to grab the project id. 
 Add also the credentials to the main.tf file. ANother way of authentication is using the gcloud cli. -> gcloud default auth-login -> gives us a link.
 
+We can also do -> export GOOGLE_CREDENTIALS='/home/ibai/work/Data_Engineering_Zoomcamp/week_1_basics_n_setup/3_terraform/keys/terraform_creds.json'
+
+
+now, terraform init.
+
+if successfully installed, it will create a .terraform folder and a .terraform lock.
+
+Now lets create a bucket in google cloud. Visit this link: https://registry.terraform.io/providers/wiardvanrij/ipv4google/latest/docs/resources/storage_bucket
+
+We add google storage bucket resource to the main.tf. Change resource variable and name. Name needs to be unique in whole google cloud, so we can add project name to it.
+
+also change the time of action in the lifecycle.
+
+Now, lets terraform plan.  We see what we will deploy later, and then -> terraform apply
+WHen applying, it createss a tfstate file which shows  the resources. In the google cloud platform, check that the bucket appears
+
+if we type terraform destroy, it would remove what we deployed.
+It would create though a terraform.tfstate.backup
+
+so remember:
+
+terraform init
+terraform plan
+terraform apply
+terraform destroy
+
 
 
 
