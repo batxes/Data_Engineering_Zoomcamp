@@ -6,7 +6,7 @@ Run docker with the `python:3.12.8` image in an interactive mode, use the entryp
 
 What's the version of `pip` in the image?
 
-- 24.3.1  <x>
+- 24.3.1  X
 - 24.2.1
 - 23.3.1
 - 23.2.1
@@ -56,7 +56,7 @@ volumes:
 - localhost:5432
 - db:5433
 - postgres:5432  
-- db:5432 <x>
+- db:5432 X
 
 If there are more than one answers, select only one of them
 
@@ -122,7 +122,7 @@ Answers:
 - 104,802;  198,924;  109,603;  27,678;  35,189
 - 104,793;  201,407;  110,612;  27,831;  35,281
 - 104,793;  202,661;  109,603;  27,678;  35,189
-- 104,838;  199,013;  109,645;  27,688;  35,202  <x> It is closest
+- 104,838;  199,013;  109,645;  27,688;  35,202  X It is closest
 
 I get: 104830, 198995, 109642, 27686, 35201
 
@@ -156,7 +156,7 @@ Tip: For every day, we only care about one single trip with the longest distance
 - 2019-10-11
 - 2019-10-24
 - 2019-10-26
-- 2019-10-31  <x>
+- 2019-10-31  X
 
 SELECT lpep_pickup_datetime, trip_distance
 FROM green_taxi_data
@@ -197,7 +197,7 @@ Note: it's `tip` , not `trip`
 We need the name of the zone, not the ID.
 
 - Yorkville West
-- JFK Airport  <x> 
+- JFK Airport  X 
 - East Harlem North
 - East Harlem South
 
@@ -237,7 +237,7 @@ Answers:
 - terraform import, terraform apply -y, terraform destroy
 - teraform init, terraform plan -auto-apply, terraform rm
 - terraform init, terraform run -auto-approve, terraform destroy
-- terraform init, terraform apply -auto-approve, terraform destroy
+- terraform init, terraform apply -auto-approve, terraform destroy  X
 - terraform import, terraform apply -y, terraform rm
 
 
