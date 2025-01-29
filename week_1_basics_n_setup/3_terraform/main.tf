@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     google = {
-      source = "hashicorp/google"
+      source  = "hashicorp/google"
       version = "6.16.0"
     }
   }
@@ -9,14 +9,14 @@ terraform {
 
 provider "google" {
   # Configuration options
-  credentials = "./keys/terraform_creds.json"
-  project     = "sylvan-cirrus-448510-s0"
-  region      = "europe-west3"
+  credentials = file(var.credentials)
+  project     = var.project
+  region      = var.region
 }
 
 resource "google_storage_bucket" "demo-bucket" {
-  name          = "sylvan-cirrus-448510-s0-terra-bucket"
-  location      = "EU"
+  name          = var.gcs_bucket_name
+  location      = var.location
   force_destroy = true
 
   lifecycle_rule {
@@ -27,5 +27,11 @@ resource "google_storage_bucket" "demo-bucket" {
       type = "AbortIncompleteMultipartUpload"
     }
   }
+}
+
+
+resource "google_bigquery_dataset" "demo_dataset" {
+  dataset_id = var.bq_dataset_name
+  location   = var.location
 }
 

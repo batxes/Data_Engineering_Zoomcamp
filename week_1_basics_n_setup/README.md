@@ -393,6 +393,24 @@ terraform plan
 terraform apply
 terraform destroy
 
+1.3.3: Terraform Variables
+
+go to google -> terraform bigquery dataset -> https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/bigquery_dataset
+
+add the bigquery_Dataset block to main.tf
+
+terraform apply ->  and chekc that demo_dataset was created in GCP.
+then terraform destroy
+
+Now we will create variable to use them in other files.
+We will use them in the main.tf file here. Let's change all the names with the variables.
+
+apply and destroy to see that it works.
+
+lets also add the credentials as variable
+
+
+
 
 
 

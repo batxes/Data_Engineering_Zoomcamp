@@ -172,7 +172,8 @@ cython_debug/
 
 ny_taxi_postgres_data/
 keys/
-3_terraform/main.tf
+3_terraform/variables.tf
+.hcl
 
 
 # Local .terraform directories
