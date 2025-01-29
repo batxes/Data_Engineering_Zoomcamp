@@ -409,6 +409,159 @@ apply and destroy to see that it works.
 
 lets also add the credentials as variable
 
+1.4.1; Setting up the Environment on Google Cloud (Cloud VM + SSH access)
+
+In GCP -> Compute Enginer -> VM instances
+
+Before creating an instance, we need to generate an SSH key, the key that we will use to log in to the instance.
+For that: https://cloud.google.com/compute/docs/connect/create-ssh-keys
+go to .ssh directory in home
+ssh-keygen -t rsa -f gcp -C ibai -b 2048
+Enter
+Enter (if we want we can add a password, but it will be needed every time we ssh to gcp)
+
+Now, we will share the public key with GCP. Go to Compute enginer -> settings -> metadata -> SSH KEYS -> add the public key and save
+
+Lets go now to VM instances and create an instance. Add name, region (I went with Belgium, it is cheapest), and E2 standard 4. 
+We can also change to ubuntu, I choose 24.04 LTS, and 30 GB storage size. Create.
+We need the external IP from the instance:
+
+and we connect: ssh -i ~/.ssh/gcp ibai@35.195.229.234
+
+We are inside:
+
+ibai@de-zoomcamp:~$ gcloud --version
+Google Cloud SDK 506.0.0
+alpha 2025.01.10
+beta 2025.01.10
+bq 2.1.11
+bundled-python3-unix 3.11.9
+core 2025.01.10
+gcloud-crc32c 1.0.0
+gsutil 5.33
+minikube 1.34.0
+skaffold 2.13.1
+
+First thing, we will download Anaconda. wget https://repo.anaconda.com/archive/Anaconda3-2024.10-1-Linux-x86_64.sh
+and install it: bash Anaconda3-2024.10-1-Linux-x86_64.sh
+allow to change the PATH so that we can call conda, if not, it will be in anaconda3/condabin/conda
+
+now, we will create a config file in .ssh to the connect easily to the gcp VM instance.
+add this to the config:
+
+Host de-zoomcamp
+    HostName 35.195.229.234
+    User ibai
+    IdentityFile ~/.ssh/gcp       
+
+and then ssh de-zoomcamp
+
+now install docker: 
+sudo apt-get update
+sudo apt-get install docker.io
+
+now we want to access the virtual machine from vscode. for that, go to extensions and install "remote ssh" (in cursor is installed) -> click left bottom corner, then connect host -> and we will have de-zoomcamp already there. (from the previous config file)
+
+It opens another vscode window. Lets clone the code repo to the VM in the terminal.
+We now test docker, but it needs permissions: check this: 
+https://github.com/sindresorhus/guides/blob/main/docker-without-sudo.md
+basically do:
+sudo groupadd docker
+sudo gpasswd -a $USER docker
+sudo service docker restart
+reconnect to the VM
+
+now we want to install docker compose: Go to github and copy the latest release: https://github.com/docker/compose
+https://github.com/docker/compose/releases/download/v2.32.4/docker-compose-linux-x86_64
+create the directory /bin and run inside: 
+  wget https://github.com/docker/compose/releases/download/v2.32.4/docker-compose-linux-x86_64 -O docker-compose
+
+make it exex: chmod +x docker-compose
+to make it visible from any dir add to PATH variable in bashrc:
+ export PATH="${HOME}"/bin:${PATH}
+ source .bashrc
+
+now lets run docker-compose in the data-engineering dir:
+  ibai@de-zoomcamp:~/data-engineering-zoomcamp/01-docker-terraform/2_docker_sql$ docker-compose up -d
+
+  it will download postgresql and pgadmin images and they will start running.
+  docker ps
+
+now install pgcli: pip install pgcli (if this fail, we can install it with conda)
+
+connect: pgcli -h localhost -U root -d ny_taxi
+pass is root
+
+now, to access this postgres database, which is running in the port 5432 in the VM, we need to forward the port to our local machine.
+Go to VScode. control + ` -> ports -> forward -> 5432.
+now we can directly access the db from our computer: pgcli -h localhost -U root -d ny_taxi
+
+  PROBLEM: 
+  (base) ibai@ibai-PC:~$ pgcli -h 127.0.0.1 -U root -d ny_taxi
+  Password for root: 
+  connection failed: connection to server at "127.0.0.1", port 5432 failed: FATAL:  password authentication failed for user "root"
+  connection to server at "127.0.0.1", port 5432 failed: FATAL:  password authentication failed for user "root"
+
+  check that the port was properly forwarded. If 5432 is being used, kill the process:
+  sudo lsof -i :5432
+  sudo kill -9 PID
+
+Now we want to add data to the db
+We first want to forward 8080 for pgadmin, use again vscode. admin@admin -> pass:root
+forward 8888 for jupyter notebook and then run to upload data to the db in the VM.
+First download the data, because we do not ahve it in the VM: 
+  wget https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz
+  note: modify the read_csv and alsoo add this line to the notebook: !pip install psycopg2-binary
+  then connect, create table and insert first 100.
+  Check: select count(1) from yellow_taxi_data;
+
+Now, lets install terraform. DOwnload in the bin dir and unzip: 
+wget https://releases.hashicorp.com/terraform/1.10.5/terraform_1.10.5_linux_amd64.zip  
+unzip terraform_1.10.5_linux_amd64.zip
+
+it is already executable and in bin folder so we can call it from anywhere
+We will set up terraform now: plan, apply and so on.
+We need the service account json credentials. We will put the json file in the VM, with sftp.
+sftp de-zoomcamp
+Connected to de-zoomcamp.
+sftp> mkdir .gc
+sftp> cd .gc
+sftp> ls
+sftp> put terraform_creds.json
+Uploading terraform_creds.json to /home/ibai/.gc/terraform_creds.json
+terraform_creds.json                     100% 2395    97.3KB/s   00:00    
+sftp> 
+
+Now, to authonticate in the VM:
+  export GOOGLE_APPLICATION_CREDENTIALS=~/.gc/terraform_creds.json
+  gcloud auth activate-service-account --key-file $GOOGLE_APPLICATION_CREDENTIALS
+
+  now, in the VM, we can go and do the init, plan and apply.
+
+Tu shutdown the VM:
+  in GCP, actions->stop (also delete) / delete will remove everything, data too. (I will be charged for the storage if not deleted.)
+  or "shutdown now" from the terminal
+WHen restarting, the IP might change so we have to also change the .ssh/config file
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
