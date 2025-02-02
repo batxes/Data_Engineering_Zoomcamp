@@ -13,7 +13,7 @@ docker run -it test:pandas -> it will run the image
 
 we can modify more the dockerfile and run it:
 
-(base) ibai@ibai-PC:~/work/Data_Engineering_Zoomcamp/week_1_basics_n_setup/2_docker_sql$ docker run -it test:pandas 2021-01-15 123
+(base) ibai@ibai-PC:~/work/Data_Engineering_Zoomcamp/1_docker_terraform/2_docker_sql$ docker run -it test:pandas 2021-01-15 123
 ['pipeline.py', '2021-01-15', '123']
 job finished successfully for day = 2021-01-15
 
@@ -367,7 +367,7 @@ We can align the json with "terraform fmt".
 Go to the GCP dashboard to grab the project id. 
 Add also the credentials to the main.tf file. ANother way of authentication is using the gcloud cli. -> gcloud default auth-login -> gives us a link.
 
-We can also do -> export GOOGLE_CREDENTIALS='/home/ibai/work/Data_Engineering_Zoomcamp/week_1_basics_n_setup/3_terraform/keys/terraform_creds.json'
+We can also do -> export GOOGLE_CREDENTIALS='/home/ibai/work/Data_Engineering_Zoomcamp/1_docker_terraform/3_terraform/keys/terraform_creds.json'
 
 
 now, terraform init.

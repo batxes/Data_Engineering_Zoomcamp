@@ -11,7 +11,7 @@ What's the version of `pip` in the image?
 - 23.3.1
 - 23.2.1
 
-(base) ibai@ibai-PC:~/work/Data_Engineering_Zoomcamp/week_1_basics_n_setup/homework$ docker run -it python:3.12.8 bash
+(base) ibai@ibai-PC:~/work/Data_Engineering_Zoomcamp/1_docker_terraform/homework$ docker run -it python:3.12.8 bash
 (ALSO docker run -it --entrypoint=bash python:3.12.8)
 root@57d15bad1693:/# pip --version
 pip 24.3.1 from /usr/local/lib/python3.12/site-packages/pip (python 3.12)
