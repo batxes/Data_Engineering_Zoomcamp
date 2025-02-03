@@ -172,7 +172,7 @@ cython_debug/
 
 ny_taxi_postgres_data/
 keys/
-week_1_basics_n_setup/3_terraform/variables.tf
+1_docker_terraform/3_terraform/variables.tf
 .terraform.lock.hcl
 
 
