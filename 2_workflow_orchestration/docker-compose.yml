@@ -1,7 +1,3 @@
-networks:
-  kestra-net:
-    driver: bridge
-
 volumes:
   postgres-data:
     driver: local
@@ -10,8 +6,6 @@ volumes:
 
 services:
   postgres:
-    networks:
-      - kestra-net
     image: postgres
     volumes:
       - postgres-data:/var/lib/postgresql/data
@@ -19,17 +13,13 @@ services:
       POSTGRES_DB: kestra
       POSTGRES_USER: kestra
       POSTGRES_PASSWORD: k3str4
-      POSTGRES_HOST_AUTH_METHOD: trust
-      PGDATA: /var/lib/postgresql/data/pgdata
     healthcheck:
-      test: ["CMD", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
-      interval: 5s
-      timeout: 5s
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 30s
+      timeout: 10s
       retries: 10
 
   kestra:
-    networks:
-      - kestra-net
     image: kestra/kestra:latest
     pull_policy: always
     user: "root"
