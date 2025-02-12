@@ -39,6 +39,10 @@ What is the **estimated amount** of data that will be read when this query is ex
 - 2.14 GB for the External Table and 0MB for the Materialized Table
 - 0 MB for the External Table and 0MB for the Materialized Table
 
+SELECT COUNT(DISTINCT(PULocationID)) FROM `dezoomcamp-ibai.yellow_taxi_2024_1_6.yellow_taxi`;
+SELECT COUNT(DISTINCT(PULocationID)) FROM `dezoomcamp-ibai.yellow_taxi_2024_1_6.yellow_taxi_external`;
+
+
 ## Question 3:
 Write a query to retrieve the PULocationID from the table (not the external table) in BigQuery. Now write a query to retrieve the PULocationID and DOLocationID on the same table. Why are the estimated number of Bytes different?
 - BigQuery is a columnar database, and it only scans the specific columns requested in the query. Querying two columns (PULocationID, DOLocationID) requires 
@@ -47,6 +51,9 @@ reading more data than querying one column (PULocationID), leading to a higher e
 doubling the estimated bytes processed.
 - BigQuery automatically caches the first queried column, so adding a second column increases processing time but does not affect the estimated bytes scanned.
 - When selecting multiple columns, BigQuery performs an implicit join operation between them, increasing the estimated bytes processed
+
+SELECT PULocationID FROM `dezoomcamp-ibai.yellow_taxi_2024_1_6.yellow_taxi`
+SELECT PULocationID, DOLocationID FROM `dezoomcamp-ibai.yellow_taxi_2024_1_6.yellow_taxi`
 
 ## Question 4:
 How many records have a fare_amount of 0?
@@ -100,6 +107,9 @@ It is best practice in Big Query to always cluster your data:
 
 ## (Bonus: Not worth points) Question 9:
 No Points: Write a `SELECT count(*)` query FROM the materialized table you created. How many bytes does it estimate will be read? Why?
+
+It says 0.  I guess it reads from the metadata? Because I removed the cached option.
+SELECT COUNT(*) FROM `dezoomcamp-ibai.yellow_taxi_2024_1_6.yellow_taxi_partitioned_clustered`;
 
 
 ## Submitting the solutions
