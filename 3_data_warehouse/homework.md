@@ -89,7 +89,7 @@ Where is the data stored in the External Table you created?
 
 - Big Query
 - Container Registry
-- GCP Bucket
+- GCP Bucket  <- this
 - Big Table
 
 ## Question 8:
