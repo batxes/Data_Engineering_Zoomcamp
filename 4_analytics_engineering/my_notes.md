@@ -57,11 +57,21 @@ dbt cloud is a hosted service that allows you to run dbt projects. It includes a
 
 https://www.youtube.com/watch?v=J0XCDyKiU64&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=35&ab_channel=Victoria
 
+alternative B, locally is: https://www.youtube.com/watch?v=1HmL63e-vRs&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=36&ab_channel=DataTalksClub%E2%AC%9B
+
 every dbt project has many folders. dbt already will provide the starter project.
 With the CLI, we can run dbt init.
 with the dbt cloud, the IDE will guide us.
 
 we will need the dbt_project.yml file to configure the project.
+
+when configurint dbt, and adding github, the deploy key generated and added to github, give read and write permissions, without it, we can not commit the code from the dbt IDE.
+
+## development of dbt models
+
+https://www.youtube.com/watch?v=ueVy2N54lyc&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=37&ab_channel=Victoria
+
+
 
 
 
