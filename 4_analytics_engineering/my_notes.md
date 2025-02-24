@@ -1,6 +1,28 @@
 
 # Analytics Engineering
 
+Before we start, I uploaded the data to GCS with the script in 3_data_warehouse/web_to_gcs.py
+then I created a new dataset in BigQuery and loaded the data from GCS to BigQuery runnning this:
+
+CREATE OR REPLACE EXTERNAL TABLE `dezoomcamp-ibai.trips_data_all.green_tripdata`
+OPTIONS (
+  format = 'PARQUET',
+  uris = ['gs://dezoomcamp_bigquery_week3_2025/green/green_tripdata_*.parquet']
+);
+
+CREATE OR REPLACE EXTERNAL TABLE `dezoomcamp-ibai.trips_data_all.yellow_tripdata`
+OPTIONS (
+  format = 'PARQUET',
+  uris = ['gs://dezoomcamp_bigquery_week3_2025/yellow/yellow_tripdata_*.parquet']
+);
+
+CREATE OR REPLACE EXTERNAL TABLE `dezoomcamp-ibai.trips_data_all.fhv_tripdata`
+OPTIONS (
+  format = 'PARQUET',
+  uris = ['gs://dezoomcamp_bigquery_week3_2025/fhv/fhv_tripdata_*.parquet']
+);
+```
+
 ## Analytics Engineering Basics
 
 https://www.youtube.com/watch?v=uF76d5EmdtU&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=41&ab_channel=DataTalksClub%E2%AC%9B
@@ -70,6 +92,56 @@ when configurint dbt, and adding github, the deploy key generated and added to g
 ## development of dbt models
 
 https://www.youtube.com/watch?v=ueVy2N54lyc&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=37&ab_channel=Victoria
+
+we will be using a modular data modeling.
+First we have data tables that we loadedd, liket trip data, then we will build sql scripts tjhat we are going to call them models, in dbt that are going to be doing transformations.
+So, we take the data, and with the models, we will clean, duplicate, recast, rename and son on.
+
+we will alwaus work with sql files with the name of the model.
+we will write a select statement, and then we will add the transformations that we want to do.
+with config(materialized='table') we will specify that we want to create a table in the data warehouse.
+we can also have view, incremental, ephemeral, etc.
+- ephemeral models are temporary models that are not saved in the data warehouse. They only exist for a single dbt run.
+- views are virtual tables created by dbt can be queries like regular tables.
+- tables are saved in the data warehouse.
+- incremetal materialization are a powerful feature that allows for efficient updates to existint rables reducing the need for full data refreshes.
+
+the FROM clause:
+Sources: configuration is in yaml files. Data loaded to our data warehouse that we uses a soruce for our models.
+Seeds: csv files stores in our repository under seed folder. 
+refs: macro to refrence the underlying tables and views that were building the data warehouse. Run the same code in any environment.
+
+now, we created a schema.yml under models/staging. 
+
+``` 
+version: 2
+
+sources:
+  - name: staging
+    database: dezoomcamp-ibai
+    schema: trips_data_all
+      
+    tables:
+      - name: green_tripdata
+      - name: yellow_tripdata
+```
+Save and the generate the model green:
+
+```
+dbt run -m model_name
+```
+or also click on the model in dbt.
+then, save the stg_green_tripdata.sql file.
+
+then 
+``` 
+dbt build.
+```
+it wont work unless you create a new dataset in bigquery, unter EU with the dbt_dataset + name of the project: name: 'dbt_dataset_taxi_rides_ny_bq'
+
+
+
+
 
 
 
