@@ -139,6 +139,10 @@ dbt build.
 ```
 it wont work unless you create a new dataset in bigquery, unter EU with the dbt_dataset + name of the project: name: 'dbt_dataset_taxi_rides_ny_bq'
 
+delete the examples because we will not use them.
+
+I am in minute 17:28
+
 
 
 
