@@ -141,7 +141,151 @@ it wont work unless you create a new dataset in bigquery, unter EU with the dbt_
 
 delete the examples because we will not use them.
 
-I am in minute 17:28
+Now lets learn about Macros:
+
+Those are the curly brackets: { }
+It actually uses jinja templating language.
+We will call functions inside those brackets.
+they have input and the output is code.
+It will also help us create our own functions and code, dynamically.
+between {% %} we will write the code. it will be executed and get a variable in between {{}}
+
+We will create a macro in dbt: macros folder-> create a file -> get_payment_type_description.sql
+
+```
+{#
+    This macro returns the description of the payment_type 
+#}
+
+{% macro get_payment_type_description(payment_type) -%}
+
+    case {{ dbt.safe_cast("payment_type", api.Column.translate_type("integer")) }}  
+        when 1 then 'Credit card'
+        when 2 then 'Cash'
+        when 3 then 'No charge'
+        when 4 then 'Dispute'
+        when 5 then 'Unknown'
+        when 6 then 'Voided trip'
+        else 'EMPTY'
+    end
+
+{%- endmacro %}
+```
+
+payment_type then can be used anywhere in the project.
+
+add to the select clause in stg_green_tripdata.sql:
+
+```
+{{ get_payment_type_description(payment_type) }} as payment_type_description
+```
+compile and see what the macro does.
+
+We can also write packages. These are dbt projects that can be reused in other projects.
+Like libraries in other programming languages.
+imported in the packages.yml file and imported by running dbt deps.
+dbt_packages_hub.com is a website that has a lot of packages.
+
+we will use dbt_utils. Copy how we install it.
+```
+packages:
+  - package: dbt-labs/dbt_utils
+    version: 1.3.0
+```
+
+create packages.yml under the home of dbt project and paste that code.
+now, dbt deps will install the package.
+
+now copy the code for generate_surrogate_key.sql and paste it in the macros folder (from the dbt uitls, in the hub webpase).
+
+```
+{{ dbt_utils.generate_surrogate_key(['field_a', 'field_b'[,...]]) }}
+```
+
+we will add to stg_green_tripdata.sql:
+
+```
+{{ dbt_utils.generate_surrogate_key(['VendorID', 'lpep_pickup_datetime']) }} as trip_id
+```
+
+let's build the stg_green_tripdata model.
+
+everytime we run dbt build, bigquery will be updated.
+
+Now, we are ready to copy the whole code fromt eh respository of data talks club.
+https://github.com/DataTalksClub/data-engineering-zoomcamp/blob/main/04-analytics-engineering/taxi_rides_ny/models/staging/stg_green_tripdata.sql
+
+in this code, 
+we have a config macro. It is not needed really but it does not hurt. 
+we can get the code with underscore underscore. __ and then tab, to open autocomplete jinja.
+
+then, there is lots of code and in the end, variables:
+
+Variables are useful for defining parameters that can be reused in the code.
+
+```
+{{ var('my_var') }}
+``` 
+
+regardles, lets run the code as it is. 
+dbt build
+
+I actually get an error, because the table in bigquery contains a float in a column and dbt can not partition with float.
+
+Regardles, lets continue.
+In the code, we can build with a variable:
+
+if we want to change the limit in the sql model, we can do this:
+
+-- dbt build --select stg_green_tripdata --vars '{'is_test_run': 'false'}'
+
+now, it will not add the limit 100
+
+now, create a file in staging: stg_yellow_tripdata.sql
+and copy the code from the repository.
+
+
+now add seeds.
+the link is here: https://github.com/DataTalksClub/data-engineering-zoomcamp/blob/main/04-analytics-engineering/taxi_rides_ny/seeds/taxi_zone_lookup.csv
+go to raw, and copy. 
+under seeds, create a file, taxi_zone_lookup.csv and paste the data.
+build
+
+if we do refresh in bigquery, we will see the data.
+
+
+Now, in the models folder, craete a folder called core, and inside, dim_zones.sql file.
+We will add all the information about the zones.
+copy this code: https://github.com/DataTalksClub/data-engineering-zoomcamp/blob/main/04-analytics-engineering/taxi_rides_ny/models/core/dim_zones.sql
+
+this code is selecting from the taxi lookup table and selecting the borough, service zone, zone and the location id.
+
+now create a fact_trips.sql model, under core folder.
+fact_trips will combine in the end the green and yellow tripdata with the zone information.
+
+
+## Testing and documenting dbt models
+https://www.youtube.com/watch?v=2dNJXHFCHaY&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=38&ab_channel=Victoria
+
+dbt tests
+
+assumptions that we make about our data.
+tests in dbt are essenelat a select sql query.
+they return the amount of failing records
+tests are defined on a colum in the .yml file.
+dbt provides basic tests to check if the column values are unique, not null, accepted values and son on.
+
+We can get also the package called dbt_codegen which generates code for us for different models.
+It is also useful the dbt_expectations package, which contains lots of tests.
+
+
+Documentation:
+we can add real documentation to our models.
+for every object that we have and use in dbt, will be able to create a web page with the documentation.
+It will take infor from differnt places like the yml or our code
+
+
+
 
 
 
