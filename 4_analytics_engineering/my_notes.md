@@ -284,6 +284,72 @@ we can add real documentation to our models.
 for every object that we have and use in dbt, will be able to create a web page with the documentation.
 It will take infor from differnt places like the yml or our code
 
+## Deployment of dbt project in the cloud
+
+Deployment is the process of running the models we created in our development environment in a production environment.
+A development -deployment workflow will be something like:
+- develop in a user branch
+- open a PR to merge into the main branch- merge the branch to themain brahnch
+- run the new models in the production environment using the main branch
+- schedule the models
+
+
+Dbt cloud includes a scheduler where to create hobs to run in production.
+A single job can run multiple commands
+jobs can be triggered manually or scheduled
+eachjob will keep a log of the returnsa job could also generate documanetation
+
+We first go in the dbt cloud, to Deploy - > environments -> new one called production. Dataset = prod
+Then, Create job -> Deploy job. Job name "nightly", Description = "This is where data hits production"
+check Generate docs on the run.
+Check run source freshness.
+the command will be dbt build.
+run on schedule and for example at 12h every day.
+
+if we run manually, we will see that it first clones the repository, creates the bigquery connection, invokes dbt deps, dbt source freshnes, build and docs generate.
+
+we can go to the dashboard, settings and check for nightly and go to the documentation.
+
+Continuous Integration and Continuous deployment:
+This is the practice of regularly merging code into main, and making sure that it is automated that is not going to break production, with tests and runs.
+
+So we can create also a Continuous Integration job in dbt cloud, with production environment and triggered by pull requests.
+the command will be dblt build --select state:modified+
+we can also add another command like: dbt test documented_models
+Compare everything against Production.
+
+In case we want to do deplyment locally: https://www.youtube.com/watch?v=Cs9Od1pcrzM&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=40&ab_channel=DataTalksClub%E2%AC%9B
+
+## Visualizing data with Google Data Studio (alternative A)
+
+https://www.youtube.com/watch?v=39nLTs74A3E&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=41&ab_channel=DataTalksClub%E2%AC%9B
+
+go to google data studio: https://lookerstudio.google.com/u/0/navigation/reporting
+
+create a data source -> big query and choose the dataset.
+
+We then create a new report add the charts we want.
+Later we can download the report as a dashboard or pdf.
+
+## Visualizing data with Looker Studio (alternative B)
+
+https://www.youtube.com/watch?v=39nLTs74A3E&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=41&ab_channel=DataTalksClub%E2%AC%9B
+
+
+## Visualizing data with Metabase (alternative B)
+
+https://www.youtube.com/watch?v=BnLkrA7a6gM&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=42&ab_channel=DataTalksClub%E2%AC%9B
+
+
+
+
+
+
+
+
+
+
+
 
 
 
