@@ -6,9 +6,28 @@
 
 [![](https://markdown-videos-api.jorgenkh.no/youtube/dcHe5Fl3MF8)](https://youtu.be/dcHe5Fl3MF8&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=51)
 
+Many ways of processing data.
+Batch and streaming.
+
+Batch processing is when the processing and analysis happens on a set of data that have already been stored over a period of time
+Streaming data processing happens as the data flows through a system. This results in analysis and reporting of events as it happens.
+
+Batch jobs can be weekly, daily, hourly and also higher frequency.
+Technologies: Python scripts, SQL, Spark, Flink.
+    Python scripts can be run in Kubernetes, AWS batch... 
+    To orchestrate all these batch jobs we will use airflow. 
+
 * :movie_camera: 5.1.2 Introduction to Spark
 
 [![](https://markdown-videos-api.jorgenkh.no/youtube/FhaqbEOuQ8U)](https://youtu.be/FhaqbEOuQ8U&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=52)
+
+Apache Spark is a analytics engine for large scale data processing.
+Sparks pulls the data to their executers and then outputs to another db for example. Is an engine because the processing happens in spark. It can also be in a cluster.
+It is multi language for java and scale. For python there is a wrapper, called PySpark.
+It can be used for both batch and streaming processing.
+It is tipically used when data is in a data lake, like S3 of GCS. Then sparks makes processing nd put again in Data lake. Normally you can used bigquery or SQL in the DL, but if you can not really use SQL for the processing, you can use Spark.
+in a nutshell:
+Raw Data -> LAKE -> SQL -> SPARK -> PYTHON Train ML  
 
 
 ## 5.2 Installation
@@ -32,12 +51,24 @@ Alternatively, if the setups above don't work, you can run Spark in Google Colab
 * [Google Colab Instructions](https://medium.com/gitconnected/launch-spark-on-google-colab-and-connect-to-sparkui-342cad19b304)
 * [Google Colab Starter Notebook](https://github.com/aaalexlit/medium_articles/blob/main/Spark_in_Colab.ipynb)
 
+ 
+
+run spark-shell
+
+val data = 1 to 10000
+val distData = sc.parallelize(data)
+distData.filter(_ < 10).collect()
+
+
+
 
 ## 5.3 Spark SQL and DataFrames
 
 * :movie_camera: 5.3.1 First Look at Spark/PySpark
 
 [![](https://markdown-videos-api.jorgenkh.no/youtube/r_Sf6fCB40c)](https://youtu.be/r_Sf6fCB40c&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=54)
+
+
 
 * :movie_camera: 5.3.2 Spark Dataframes
 
