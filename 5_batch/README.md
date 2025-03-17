@@ -60,6 +60,12 @@ val distData = sc.parallelize(data)
 distData.filter(_ < 10).collect()
 
 
+add top bashrc:
+
+PYTHONPATH="/usr/bin/python3.12"; export PYTHONPATH;
+export PYTHONPATH="${SPARK_HOME}/python/:$PYTHONPATH"
+export PYTHONPATH="${SPARK_HOME}/python/lib/py4j-0.10.9.5-src.zip":$PYTHONPATH
+
 
 
 ## 5.3 Spark SQL and DataFrames
@@ -68,11 +74,21 @@ distData.filter(_ < 10).collect()
 
 [![](https://markdown-videos-api.jorgenkh.no/youtube/r_Sf6fCB40c)](https://youtu.be/r_Sf6fCB40c&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=54)
 
+- Reading CSV files
+- Partitions
+- Saving data to Parquet for local experiments
+- Spark master UI
+
+in localhost:4040 we have the pyspark master application UI
 
 
 * :movie_camera: 5.3.2 Spark Dataframes
 
 [![](https://markdown-videos-api.jorgenkh.no/youtube/ti3aC1m3rE8)](https://youtu.be/ti3aC1m3rE8&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=55)
+
+- Actions vs transformations
+- Functions and UDFs
+
 
 * :movie_camera: 5.3.3 (Optional) Preparing Yellow and Green Taxi Data
 
