@@ -12,6 +12,16 @@ from a Kafka stream
 * [2025 Homework](../cohorts/2025/06-streaming/homework.md)
 
 
+We will be running many "machines" with docker compose:
+ - redpanda, jobmanager (Flink), taskmanager (Flink), postgres
+
+run docker compose
+´´´
+    docker-compose up
+´´´
+go to localhost:8081 to check the dashboard.
+
+
 ## Theoretical part: Kafka + Java (optional)
 
 In this set of videos, we cover Kafka and give examples in Java
